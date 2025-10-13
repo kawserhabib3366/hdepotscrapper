@@ -1,16 +1,12 @@
 import logging
 import json
 import pickle
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import undetected_chromedriver as uc
+
 
 import subprocess
 
 import re,time
 
-from selenium.common.exceptions import TimeoutException
 
 # =======================
 # LOGGING CONFIGURATION
@@ -34,44 +30,6 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
-
-
-def get_chrome_major_version():
-    try:
-        # Try Windows registry query for Chrome version
-        output = subprocess.check_output(
-            r'reg query "HKEY_CURRENT_USER\Software\Google\Chrome\BLBeacon" /v version',
-            shell=True, text=True
-        )
-        version_match = re.search(r"version\s+REG_SZ\s+([\d.]+)", output)
-        if version_match:
-            return int(version_match.group(1).split('.')[0])
-    except Exception:
-        pass
-
-    try:
-        # fallback: run 'chrome --version' in PATH
-        output = subprocess.check_output(["chrome", "--version"], text=True)
-        version_match = re.search(r"(\d+)\.\d+\.\d+\.\d+", output)
-        if version_match:
-            return int(version_match.group(1))
-    except Exception:
-        pass
-
-    raise RuntimeError("Could not detect Chrome version")
-
-
-def get_driver(headless: bool = False) -> uc.Chrome:
-
-    version = get_chrome_major_version()
-    logger.info(f"Detected Chrome version: {version}")
-    options = uc.ChromeOptions()
-    if headless:
-        options.add_argument("--headless=new")
-
-    options.add_argument("--disable-popup-blocking")
-    options.add_argument("--no-sandbox")
-    return uc.Chrome(version_main=version,options=options)
 
 
 
