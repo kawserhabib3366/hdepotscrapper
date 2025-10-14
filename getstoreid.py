@@ -6,6 +6,11 @@ import pickle
 import subprocess
 
 import re,time
+import requests
+from bs4 import BeautifulSoup
+
+
+
 
 
 # =======================
@@ -31,11 +36,14 @@ console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
 
-
-
-
 import requests
-from bs4 import BeautifulSoup
+
+proxies = {
+    "http": "http://nxdztznl:8k2b4ejdywvj@46.202.67.247:6243",
+    "https": "http://nxdztznl:8k2b4ejdywvj@46.202.67.247:6243",
+}
+
+
 
 
 
@@ -44,10 +52,13 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
 
+
+
+
 def get_regions():
     """Scrape all state regions with their URLs"""
     url = "https://www.homedepot.com/l/storeDirectory"
-    response = requests.get(url, headers=HEADERS)
+    response = requests.get(url,headers=HEADERS)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -61,7 +72,7 @@ def get_regions():
 
 def get_stores(state_url):
     """Scrape all unique stores for a given state"""
-    response = requests.get(state_url, headers=HEADERS)
+    response = requests.get(state_url,headers=HEADERS)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
 
