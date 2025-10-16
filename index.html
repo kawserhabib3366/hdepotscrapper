@@ -1,19 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Mini App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Mini App</title>
+  <style>
+    /* Reset some defaults */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #f5f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #2f3640;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #dcdde1;
+      resize: none;
+      font-size: 16px;
+      margin-bottom: 20px;
+      transition: border 0.3s;
+    }
+
+    textarea:focus {
+      border-color: #0097e6;
+      outline: none;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #fff;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    .start {
+      background: #44bd32;
+    }
+
+    .start:hover {
+      background: #4cd137;
+    }
+
+    .stop {
+      background: #e84118;
+    }
+
+    .stop:hover {
+      background: #ff5e57;
+    }
+
+    .status-btn {
+      background: #273c75;
+    }
+
+    .status-btn:hover {
+      background: #40739e;
+    }
+
+    #status {
+      padding: 10px;
+      background: #f1f2f6;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #2f3640;
+      word-break: break-word;
+    }
+
+    @media (max-width: 500px) {
+      .btn-group {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
-<h1>Hello from Telegram Mini App!</h1>
-<button id="sendData">Send Data</button>
+  <div class="container">
+    <h2>Telegram Mini App</h2>
+    <textarea id="items" placeholder="Enter items, one per line"></textarea>
+    <div class="btn-group">
+      <button class="start" onclick="sendAction('start')">Start</button>
+      <button class="stop" onclick="sendAction('stop')">Stop</button>
+      <button class="status-btn" onclick="sendAction('status')">Status</button>
+    </div>
+    <p id="status"></p>
+  </div>
 
-<script>
-const tg = window.Telegram.WebApp;
+  <script>
+    const tg = window.Telegram.WebApp;
+    const chat_id = tg.initDataUnsafe?.user?.id;
 
-document.getElementById("sendData").onclick = () => {
-    tg.sendData("Hello Bot!");
-};
-</script>
+    async function sendAction(action) {
+      const items = document.getElementById("items").value.split("\n").filter(Boolean);
+      const response = await fetch("http://localhost:5000/webapp", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({chat_id, action, items})
+      });
+      const data = await response.json();
+      document.getElementById("status").innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
 </body>
 </html>
