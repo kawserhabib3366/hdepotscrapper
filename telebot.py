@@ -205,7 +205,7 @@ async def process_items(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> Non
             for attempt in range(1, MAX_RETRIES + 2):
                 try:
                     # If your get_all_store_price expects different args, update accordingly
-                    result = await asyncio.to_thread(get_all_store_price, item)
+                    result = await get_all_store_price(item)
                     # Optionally do something with result
                     await context.bot.send_message(chat_id, text=f"Result for '{item}': {result}")
                     success = True
