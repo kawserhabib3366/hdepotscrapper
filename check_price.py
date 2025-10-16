@@ -277,7 +277,7 @@ def get_all_store_price(itemId="205143494", stores_file="stores.json", proxy="ht
 # 40% off
 # That store gets flagged because it’s more than 30% off and more than $50 cheaper.
 
-send_email_notification("test mail format")
+#send_email_notification("test mail format")
 #get_all_store_price(itemId="205143494")
 
 
