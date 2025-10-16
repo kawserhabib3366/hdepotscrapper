@@ -97,6 +97,9 @@ def fetch_product(
     except requests.RequestException as e:
         # network / timeout / connection error
         raise
+        return
+    except Exception as e:
+    	return
 
     # Basic status handling
     if resp.status_code != 200:
@@ -150,9 +153,9 @@ def get_all_store_price(itemId="205143494", stores_file="stores.json", proxy="ht
     for store in stores:
         i+=1
 
-        if i > 100:
+        # if i > 100:
             
-            break
+        #     break
 
         storeId = store.get("storeId")
         zipcode = store.get("storeZip")
@@ -184,6 +187,9 @@ def get_all_store_price(itemId="205143494", stores_file="stores.json", proxy="ht
             # Send request via your existing fetch_product() or fallback to requests.post
             result = fetch_product(baseapi, HEADERS, json.dumps(payload).encode("utf-8"),
                                    proxy=proxy, verify=False)
+            if not result:
+            	print("Cannot connect")
+            	return
 
             # Validate response
             required_keys = ["itemId", "productLabel", "canonicalUrl", "price_value"]
@@ -206,6 +212,7 @@ def get_all_store_price(itemId="205143494", stores_file="stores.json", proxy="ht
 
         except Exception as e:
             print(f"❌ Failed for store {storeId}: {e}")
+            return str(e)
 
     # Optionally, save results
     if not all_results:

@@ -193,7 +193,7 @@ async def process_items(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> Non
             await asyncio.sleep(0)  # allow cancellation
 
             try:
-                await context.bot.send_message(chat_id, text=f"Processing item {idx}/{len(items)}:\n{item}\n(While processing, commands will still work.)")
+                await context.bot.send_message(chat_id, text=f"Processing item {idx}/{len(items)}:\n{item}\n(While processing, commands will not work.)")
             except Conflict:
                 logger.error("Conflict when sending processing message. Another instance may be running.")
                 # Stop processing since bot instance conflict
