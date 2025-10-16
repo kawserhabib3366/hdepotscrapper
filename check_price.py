@@ -5,6 +5,11 @@ from urllib3.util.retry import Retry
 from typing import Optional, Dict, Any,Union
 import json
 import urllib3
+from send_mail import send_email_notification
+
+
+
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 url="https://www.homedepot.com/p/DEWALT-20V-Drill-Driver-Kit-DCD771C2/204279858"
@@ -122,10 +127,11 @@ def fetch_product(
 
 
 
-import json
-import requests
+
+
 
 def get_all_store_price(itemId="205143494", stores_file="stores.json", proxy="http://127.0.0.1:8080"):
+
     baseapi = "https://apionline.homedepot.com/federation-gateway/graphql?opname=productClientOnlyProduct"
 
     # Load stores safely
@@ -234,11 +240,29 @@ def get_all_store_price(itemId="205143494", stores_file="stores.json", proxy="ht
         json.dump(all_results, f, indent=2)
 
     if flagged:
-        with open("flagged_drops.json", "w", encoding="utf-8") as f:
-            json.dump(flagged, f, indent=2)
-        print(f"\n✅ Flagged {len(flagged)} significant drops (≥30% and ≥$50).")
+	    mailformat = ""
+	    for r in flagged:
+	        price = r["price"]
+	        drop_percent = r["drop_percent"]
+	        drop_amount = r["drop_amount"]
+
+	        mailformat += (
+	            f"{r['label']} at store {r['storeId']}\n"
+	            f"💰 Current Price: ${price:.2f}\n"
+	            f"📉 Drop: {drop_percent:.1f}% (${drop_amount:.2f} off)\n\n"
+	        )
+
+	    # Save flagged data
+	    with open("flagged_drops.json", "w", encoding="utf-8") as f:
+	        json.dump(flagged, f, indent=2)
+
+	    print(f"\n✅ Flagged {len(flagged)} significant drops (≥30% and ≥$50).")
+
+	    # Send email notification
+	    send_email_notification(mailformat)
+
     else:
-        print("\nℹ️ No significant drops found.")
+	    print("\nℹ️ No significant drops found.")
 
     return flagged
 
@@ -253,6 +277,7 @@ def get_all_store_price(itemId="205143494", stores_file="stores.json", proxy="ht
 # 40% off
 # That store gets flagged because it’s more than 30% off and more than $50 cheaper.
 
-get_all_store_price()
+send_email_notification("test mail format")
+#get_all_store_price(itemId="205143494")
 
 
